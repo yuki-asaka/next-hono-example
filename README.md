@@ -1,135 +1,84 @@
-# Turborepo starter
+# Next.js, Hono, and Supabase Monorepo Example
 
-This Turborepo starter is maintained by the Turborepo core team.
+This is a sample monorepo application demonstrating the integration of Next.js for the frontend, Hono for the backend, and Supabase as the BaaS (Backend as a Service). The project utilizes Bun as the package manager and features type-safe RPC between the frontend and backend.
 
-## Using this example
+## Project Structure
 
-Run the following command:
+This project is a monorepo managed with Turbo. The main components are located in the `apps` directory:
 
-```sh
-npx create-turbo@latest
+-   `apps/web`: A Next.js application for the frontend.
+-   `apps/app`: A Hono application for the backend server.
+-   `apps/api`: Contains Supabase configurations, including database migrations and Edge Functions.
+
+The `packages` directory is intended for shared code, such as UI components or utility functions.
+
+## Getting Started
+
+### Prerequisites
+
+-   [Bun](https://bun.sh/)
+-   A [Supabase](https://supabase.com/) account and project.
+
+### Installation and Setup
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/next-hono-example.git
+    cd next-hono-example
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    bun install
+    ```
+
+3.  **Set up environment variables:**
+
+    Create a `.env` file in the `apps/web` directory by copying the example file:
+    ```bash
+    cp apps/web/.env.example apps/web/.env
+    ```
+    Update the `.env` file with your Supabase project URL and anon key.
+
+4.  **Set up Supabase:**
+
+    Link your local project to your Supabase project:
+    ```bash
+    npx supabase link --project-ref <your-project-id>
+    ```
+
+    Push the database migrations:
+    ```bash
+    npx supabase db push
+    ```
+
+### Running the Development Servers
+
+You can run all applications concurrently using the following command from the root of the project:
+
+```bash
+bun dev
 ```
 
-## What's inside?
+This will start:
+- The Next.js frontend on `http://localhost:3000`
+- The Hono backend server on `http://localhost:8787`
 
-This Turborepo includes the following packages/apps:
+## Features
 
-### Apps and Packages
+-   **Monorepo:** A clean and organized project structure using Turborepo.
+-   **Type-Safe RPC:** End-to-end type safety between the Next.js frontend and the Hono backend.
+-   **Supabase Integration:** Utilizes Supabase for database, authentication, and other backend services.
+-   **Modern Tech Stack:** Built with Next.js, Hono, TypeScript, and Bun.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## Technologies Used
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+-   **Frontend:** [Next.js](https://nextjs.org/), [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/)
+-   **Backend:** [Hono](https://hono.dev/)
+-   **Database & BaaS:** [Supabase](https://supabase.com/)
+-   **Package Manager:** [Bun](https://bun.sh/)
+-   **Monorepo Manager:** [Turborepo](https://turbo.build/)
 
-### Utilities
+## License
 
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+This project is licensed under the MIT License.
