@@ -1,11 +1,12 @@
 {
-  "name": "app",
+  "name": "@repo/app",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "bun run --hot src/server.ts"
-  },
   "type": "module",
+  "scripts": {
+    "dev": "bun run --hot src/server.ts",
+    "build": "bun build src/server.ts --outdir dist --target bun"
+  },
   "exports": {
     ".": "./src/app.ts"
   },

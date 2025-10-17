@@ -14,6 +14,9 @@ import { config as baseConfig } from "./base.js";
  * */
 export const nextJsConfig = [
   ...baseConfig,
+  {
+    ignores: [".next/**", "next-env.d.ts"],
+  },
   js.configs.recommended,
   eslintConfigPrettier,
   ...tseslint.configs.recommended,
