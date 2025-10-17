@@ -1,0 +1,12 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["NODE_ENV", "VERCEL_URL", "VERCEL_ENV", "VERCEL_PROJECT_PRODUCTION_URL"]
+    },
+    "lint": {
+      "env": ["NODE_ENV", "VERCEL_URL", "VERCEL_ENV", "VERCEL_PROJECT_PRODUCTION_URL"]
+    }
+  }
+}
