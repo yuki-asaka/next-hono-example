@@ -9,7 +9,7 @@ export interface Env {
 }
 
 export function createClient(env: Env) {
-    const databaseUrl = process.env.DATABASE_URL;
+    const databaseUrl = env.DATABASE_URL;
 
     const client = postgres(databaseUrl, {
         prepare: false,

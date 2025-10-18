@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/server.ts",
-    "build": "bun build src/server.ts --outdir dist --target bun"
+    "build": "bun build src/server.ts --outdir dist --target bun",
+    "lint": "eslint . --max-warnings 0"
   },
   "exports": {
     ".": "./src/app.ts"
@@ -14,6 +15,10 @@
     "hono": "^4.9.10"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/bun": "latest",
+    "eslint": "^9",
+    "typescript": "^5"
   }
 }
