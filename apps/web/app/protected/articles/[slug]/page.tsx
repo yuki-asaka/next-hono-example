@@ -7,22 +7,28 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 
 type ArticleResponse = InferResponseType<typeof client.articles[":slug"]["$get"]>;
-type Article = ArticleResponse["data"];
+type ArticleSuccessResponse = Extract<ArticleResponse, { success: true }>;
+type Article = ArticleSuccessResponse["data"];
 
 async function getArticle(slug: string) {
     const res = await client.articles[":slug"].$get({
         param: { slug },
     });
+
     if (!res.ok) {
         if (res.status === 404) {
             return null;
         }
-        throw new Error("Failed to fetch article");
+        throw new Error("Failed to fetch article from server.");
     }
-    const data = await res.json();
+
+    const data = await res.json() as ArticleResponse;
+
     if (!data.success) {
-        throw new Error("Failed to fetch article");
+        console.error("API Error:", data.message);
+        return null;
     }
+
     return data.data as Article;
 }
 

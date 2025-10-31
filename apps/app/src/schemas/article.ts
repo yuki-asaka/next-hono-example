@@ -12,6 +12,21 @@ export const articleSchema = z.object({
 export const createArticleSchema = articleSchema.omit({id: true, createdAt: true, updatedAt: true});
 export const updateArticleSchema = articleSchema.partial().omit({id: true, createdAt: true, updatedAt: true});
 
+export const articleSuccessResponseSchema = z.object({
+  success: z.literal(true),
+  data: articleSchema,
+});
+
+export const articleErrorResponseSchema = z.object({
+  success: z.literal(false),
+  message: z.string(),
+});
+
+export const articleResponseSchema = z.union([
+  articleSuccessResponseSchema,
+  articleErrorResponseSchema,
+]);
+
 export type Article = z.infer<typeof articleSchema>;
 export type CreateArticle = z.infer<typeof createArticleSchema>;
 export type UpdateArticle = z.infer<typeof updateArticleSchema>;
