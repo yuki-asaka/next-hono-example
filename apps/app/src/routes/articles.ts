@@ -7,7 +7,6 @@ import {zValidator} from "@hono/zod-validator";
 import {createArticleSchema, updateArticleSchema} from "../schemas/article";
 
 
-
 export const articleRoutes = new Hono<{ Bindings: Env }>()
     .get("/", async (c) => {
         const client = getDbClient(c);
@@ -24,8 +23,6 @@ export const articleRoutes = new Hono<{ Bindings: Env }>()
         const slug = c.req.param("slug");
         console.log(slug)
         const article = await client.select().from(articles).where(eq(articles.slug, slug));
-
-        console.log(article)
 
         if (article.length === 0) {
             return c.json({
