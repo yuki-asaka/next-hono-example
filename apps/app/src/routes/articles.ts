@@ -1,124 +1,153 @@
-import {Env} from "../db/client";
-import {Hono} from "hono";
-import {getDbClient} from "../helpers/dbClient";
-import {articles} from "../db/schema";
-import {eq} from "drizzle-orm"
-import {zValidator} from "@hono/zod-validator";
-import {createArticleSchema, updateArticleSchema} from "../schemas/article";
+import { createRoute } from "@hono/zod-openapi";
+import {
+  articleSchema,
+  articlesSchema,
+  createArticleSchema,
+  errorResponseSchema,
+  requestParams,
+  updateArticleSchema
+} from "@repo/openapi";
+import {z} from "zod";
 
 
-export const articleRoutes = new Hono<{ Bindings: Env }>()
-    .get("/", async (c) => {
-        const client = getDbClient(c);
-        const articleList = await client.select().from(articles);
-
-        return c.json({
-            success: true,
-            data: articleList
-        })
-    })
-
-    .get("/:slug", async (c) => {
-        const client = getDbClient(c);
-        const slug = c.req.param("slug");
-        console.log(slug)
-        const article = await client.select().from(articles).where(eq(articles.slug, slug));
-
-        if (article.length === 0) {
-            return c.json({
-                success: false,
-                message: "Article not found"
-            },
-                404
-            )
+export const listArticlesRoute = createRoute({
+  method: "get",
+  path: "/",
+  responses: {
+    200: {
+      description: "Success",
+      content: {
+        "application/json": {
+          schema: articlesSchema
         }
+      }
+    }
+  }
+})
 
-        return c.json({
-            success: true,
-            data: article[0]
-        })
-    })
-
-    .post("/", zValidator("json", createArticleSchema), async (c) => {
-        const client = getDbClient(c);
-        const body = c.req.valid("json");
-
-        // check slug
-        const exists = await client.select().from(articles)
-            .where(eq(articles.slug, body.slug));
-
-        if (exists.length > 0) {
-            return c.json({
-                success: false,
-                message: "Slug already exists"
-            },
-                409
-            )
+export const getArticleRoute = createRoute({
+  method: "get",
+  path: "/{slug}",
+  request: {
+    params: requestParams
+  },
+  responses: {
+    200: {
+      description: "Success",
+      content: {
+        "application/json": {
+          schema: articleSchema
         }
-
-        const article = await client.insert(articles).values(body).returning();
-
-        return c.json({
-            success: true,
-            data: article[0]
-        })
-    })
-
-    .put("/:slug", zValidator("json", updateArticleSchema), async (c) => {
-        const client = getDbClient(c);
-        const body = c.req.valid("json");
-        const originalSlug = c.req.param("slug");
-
-        const targetArticle = await client.select().from(articles).where(eq(articles.slug, originalSlug));
-        if (targetArticle.length === 0) {
-            return c.json({
-                success: false,
-                message: "Article to update not found"
-            }, 404);
+      }
+    },
+    404: {
+      description: "Not Found",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema
         }
+      }
+    }
+  }
+})
 
-        if (body.slug) {
-            if (body.slug !== originalSlug) {
-                const exist = await client.select().from(articles)
-                .where(eq(articles.slug, body.slug));
-
-                if (exist.length > 0) {
-                    return c.json({
-                        success: false,
-                        message: "New slug already exists"
-                    }, 409);
-                }
-            }
+export const createArticleRoute = createRoute({
+  method: "post",
+  path: "/",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: createArticleSchema
         }
+      }
+    }
+  },
+  responses: {
+    200: {
+      description: "Success",
+      content: {
+        "application/json": {
+          schema: articleSchema
+        }
+      }
+    },
+    409: {
+      description: "Conflict",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema
+        }
+      }
+    }
+  }
+})
 
-        const updatedArticle = await client.update(articles)
-            .set({ ...body, updatedAt: new Date() })
-            .where(eq(articles.slug, originalSlug))
-            .returning();
+export const updateArticleRoute = createRoute({
+  method: "put",
+  path: "/{slug}",
+  request: {
+    params: requestParams,
+    body: {
+      content: {
+        "application/json": {
+          schema: updateArticleSchema
+        }
+      }
+    }
+  },
+  responses: {
+    200: {
+      description: "Success",
+      content: {
+        "application/json": {
+          schema: articleSchema
+        }
+      }
+    },
+    404: {
+      description: "Not Found",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema
+        }
+      }
+    },
+    409: {
+      description: "Conflict",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema
+        }
+      }
+    }
+  }
+})
 
-        return c.json({
-            success: true,
-            data: updatedArticle[0]
-        });
-    })
-
-    .delete("/:slug", async (c) => {
-        const client = getDbClient(c);
-        const slug = c.req.param("slug");
-
-        const targetArticle = await client.select().from(articles).where(eq(articles.slug, slug));
-        if (targetArticle.length === 0) {
-            return c
-                .json({
-                    success: false,
-                    message: "Article to delete not found"
-                }, 404);
-            }
-
-        await client.delete(articles).where(eq(articles.slug, slug));
-
-        return c.json({
-            success: true,
-            message: "Article deleted"
-        })
-    })
+export const deleteArticleRoute = createRoute({
+  method: "delete",
+  path: "/{slug}",
+  request: {
+    params: requestParams
+  },
+  responses: {
+    200: {
+      description: "Success",
+      content: {
+        "application/json": {
+          schema: z.object({
+            message: z.string()
+          })
+        }
+      }
+    },
+    404: {
+      description: "Not Found",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema
+        }
+      }
+    }
+  }
+})
