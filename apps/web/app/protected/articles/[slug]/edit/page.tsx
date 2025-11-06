@@ -2,12 +2,12 @@ import { notFound } from "next/navigation";
 import { client } from "@/lib/api/client";
 import { ArticleForm } from "@/components/articles/article-form";
 import { updateArticle } from "@/lib/actions/articles";
-import type { InferResponseType } from "hono/client";
+import { articleSchema } from "@repo/openapi";
+import { z } from "zod";
 
-type ArticleResponse = InferResponseType<typeof client.articles[":slug"]>;
-type Article = ArticleResponse["data"];
+type Article = z.infer<typeof articleSchema>;
 
-async function getArticle(slug: string) {
+async function getArticle(slug: string): Promise<Article | null> {
     const res = await client.articles[":slug"].$get({
         param: { slug },
     });
@@ -18,20 +18,23 @@ async function getArticle(slug: string) {
         throw new Error("Failed to fetch article");
     }
     const data = await res.json();
-    if (!data.success) {
-        throw new Error("Failed to fetch article");
-    }
-    return data.data as Article;
+    
+    return {
+        ...data,
+        createdAt: new Date(data.createdAt),
+        updatedAt: new Date(data.updatedAt),
+    };
 }
 
 export default async function ArticleEditPage({ params }: { params: { slug: string } }) {
-    const article = await getArticle(params.slug);
+    const slug = params.slug;
+    const article = await getArticle(slug);
 
     if (!article) {
         notFound();
     }
 
-    const updateArticleWithSlug = updateArticle.bind(null, params.slug);
+    const updateArticleWithSlug = updateArticle.bind(null, article.slug);
 
     return (
         <div className="w-full">

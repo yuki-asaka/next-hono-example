@@ -1,17 +1,13 @@
-import { client } from "@/lib/api/client";
-import type { InferResponseType } from "hono/client";
+import {client} from "@/lib/api/client";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { DeleteButton } from "@/components/articles/delete-button";
-import { notFound } from "next/navigation";
-import { format } from "date-fns";
+import {Button} from "@/components/ui/button";
+import {DeleteButton} from "@/components/articles/delete-button";
+import {notFound} from "next/navigation";
+import {format} from "date-fns";
 
-type ArticleResponse = InferResponseType<typeof client.articles[":slug"]["$get"]>;
-type ArticleSuccessResponse = Extract<ArticleResponse, { success: true }>;
-type Article = ArticleSuccessResponse["data"];
 
 async function getArticle(slug: string) {
-    const res = await client.articles[":slug"].$get({
+    const res: any = await client.articles[":slug"].$get({
         param: { slug },
     });
 
@@ -19,21 +15,19 @@ async function getArticle(slug: string) {
         if (res.status === 404) {
             return null;
         }
-        throw new Error("Failed to fetch article from server.");
+        throw new Error(`Failed to fetch article from server. Status: ${res.status}`);
     }
-
-    const data = await res.json() as ArticleResponse;
-
-    if (!data.success) {
-        console.error("API Error:", data.message);
-        return null;
-    }
-
-    return data.data as Article;
+    return await res.json();
 }
 
 export default async function ArticlePage({ params }: { params: { slug: string } }) {
-    const article = await getArticle(params.slug);
+    const slug = params.slug;
+
+    if (!slug) {
+        notFound();
+    }
+
+    const article = await getArticle(slug);
 
     if (!article) {
         notFound();

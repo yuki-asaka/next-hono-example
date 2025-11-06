@@ -6,19 +6,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 type ArticlesResponse = InferResponseType<typeof client.articles.$get>;
-type Article = ArticlesResponse["data"][number];
 
 async function getArticles() {
     const res = await client.articles.$get();
     if (!res.ok) {
         throw new Error("Failed to fetch articles");
     }
-    console.log(res);
+
     const data = await res.json();
-    if (!data.success) {
+    if (!data) {
         throw new Error("Failed to fetch articles");
     }
-    return data.data as Article[];
+    return data;
 }
 
 export default async function ArticlesPage() {
@@ -29,7 +28,7 @@ export default async function ArticlesPage() {
         redirect("/auth/login");
     }
 
-    const articles: Article[] = await getArticles();
+    const articles: ArticlesResponse = await getArticles();
 
     return (
         <div className="w-full">
