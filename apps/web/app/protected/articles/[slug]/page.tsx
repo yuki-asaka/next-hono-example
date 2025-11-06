@@ -5,18 +5,15 @@ import {DeleteButton} from "@/components/articles/delete-button";
 import {notFound} from "next/navigation";
 import {format} from "date-fns";
 
-
 async function getArticle(slug: string) {
-    const res: any = await client.articles[":slug"].$get({
+    const res = await client.articles[":slug"].$get({
         param: { slug },
     });
 
     if (!res.ok) {
-        if (res.status === 404) {
-            return null;
-        }
-        throw new Error(`Failed to fetch article from server. Status: ${res.status}`);
+        return null;
     }
+
     return await res.json();
 }
 
