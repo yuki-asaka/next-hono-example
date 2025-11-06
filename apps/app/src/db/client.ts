@@ -1,14 +1,8 @@
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
+import {schema} from "./schema.js";
 
-
-export interface Env {
-    DATABASE_URL: string;
-    FRONTEND_URL: string;
-    NODE_ENV: string;
-}
-
-export function createClient(env: Env) {
+export function createClient(env: { DATABASE_URL: string }) {
     const databaseUrl = env.DATABASE_URL;
 
     const client = postgres(databaseUrl, {
@@ -17,5 +11,5 @@ export function createClient(env: Env) {
         idle_timeout: 20,
     });
 
-    return drizzle(client);
+    return drizzle(client, { schema });
 }

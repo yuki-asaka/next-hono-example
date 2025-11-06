@@ -12,6 +12,8 @@
     ".": "./src/app.ts"
   },
   "dependencies": {
+    "@hono/swagger-ui": "^0.5.2",
+    "@repo/openapi": "workspace:*",
     "hono": "^4.9.10"
   },
   "devDependencies": {
